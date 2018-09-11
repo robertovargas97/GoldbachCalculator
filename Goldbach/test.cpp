@@ -4,6 +4,9 @@ int main(int argc, char* argv[])
 {
 
     GoldbachTester goldbachTester(argc, argv);
-    return goldbachTester.run();
+    goldbachTester.run();
+    goldbachTester.testPercent();
+
+    return 0;
 
 }

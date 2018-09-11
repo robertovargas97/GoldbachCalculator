@@ -12,17 +12,23 @@ class GoldbachTester : public QCoreApplication
     Q_OBJECT
     Q_DISABLE_COPY(GoldbachTester)
 
-  protected:
+protected:
     QMap<GoldbachCalculator*, QFileInfo> calculators;
 
-  public:
+public:
+
     explicit GoldbachTester(int &argc, char **argv);
+    double succesCases = 0;
+    double errorCases = 0;
+    double totalCases = 0;
     int run();
     bool testDirectory(const QString& path);
     bool testFile(const QFileInfo& fileInfo);
     static QVector<QString> loadLines(const QFileInfo& fileInfo);
 
-  protected slots:
+    void testPercent ();
+
+protected slots:
     void calculationDone();
 };
 

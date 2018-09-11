@@ -39,12 +39,9 @@ public:
     void startCalculation(long long number);
 
     /**
-     * @brief prepare reinicia todas la variables y botones antes de empezar el calculo para así no acumular valores en tiempo, cantidad
-     * de sumas o porcentaje de la barra de progreso
+     * @brief prepare reinicia todas la variables y botones antes de empezar el calculo para así no acumular valores en tiempo, cantidad de sumas o porcentaje de la barra de progreso
      */
     void prepare();
-
-signals:
 
 private slots:
     void on_lineEditNumber_textEdited(const QString &arg1);
@@ -53,11 +50,8 @@ private slots:
     void on_pushButtonStop_clicked();
 
 protected slots:
-    //Señal que inidica que un worker termino
     void calculationDone(int workerNumber, long long sumCount,double seconds,long beginning,long end,int ideal);
-
-    //Señal para actualizar la barra de progreso
-    void updateProgressBar(long long percent);
+    void updateProgressBar(int percent);
 };
 
 #endif // MAINWINDOW_H

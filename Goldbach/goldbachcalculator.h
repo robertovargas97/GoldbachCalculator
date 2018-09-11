@@ -16,17 +16,11 @@ protected:
     int fetchedRowCount = 0;
     int ideal = 0; //Numero ideal de threads
     int workersFinished = 0; //Indicara la cantidad de workers que terminaron el proceso
-
     GoldbachWorker* goldbachWorker = nullptr;
-
-    QVector <QString> resultsForTest; //Almacenara todos los resultados del calculo en orden una vez que se inicie la prueba
-
-    QVector<QVector <QString>> results; //Almacenara los arreglos de resultados provenientes de cada worker
-
-    QVector<GoldbachWorker*> goldbachWorkersArray; //Almacenará los workers para poder manipularlos segun su WorkerNumber
-
+    QVector <QString> resultsForTest; //Almacenara todos los resultados en orden
+    QVector<QVector <QString>> results;
+    QVector<GoldbachWorker*> goldbachWorkersArray;
     bool * sieveOfEratosthenes = nullptr;
-
 
     /**
      * @brief totalNumbers calculara el numero de elemtos totales que existen en el vector de vectores, es decir la cantidad de
@@ -36,18 +30,18 @@ protected:
     long long totalNumbers () const;
 
     void fillSieveOfEratosthenes(long long number);
+    void evenNumbers (long long number);
 
 public:
     explicit GoldbachCalculator(QObject *parent = nullptr);
-
-    /**
-     * @brief getAllSums Consolidara todos los vectores de sumas en uno solo para realizar las pruebas en el tester
-     * @return  retorna un arreglo con todas las sumas
-     */
-    QVector <QString> getAllSums();
-
     void calculate(long long number);
     void stop();
+
+    /**
+         * @brief getAllSums Consolidara todos los vectores de sumas en uno solo para realizar las pruebas en el tester
+         * @return  retorna un arreglo con todas las sumas
+    */
+    QVector <QString> getAllSums();
 
 public: // Overriden methods from QAbastractListModel
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -58,21 +52,14 @@ protected:
     virtual void fetchMore(const QModelIndex &parent) override;
 
 signals:
-    //Señal para emitir los datos necesarios en el GoldBachCalculator
     void calculationDone(int workerNumber,long long sumCount,double seconds,long beginning,long end,int ideal);
-
+    void updateProgressB(int percent);
     //Señal para indiciar que se debe iniciar la prueba con el tester
     void beginTest ();
 
-    //Señal para actualizar barra de progreso
-    void updateProgressB(int percent);
-
 protected slots:
-    //Ranura o campo para recibir los datos necesarios desde el goldBachWorker
-    void workerDone(int workerNumber, long long sumCount, double seconds, long beginning, long end, QVector<QString> workerResults);
-
-    //Señal para actualizar la barra de progreso
-    void updateProgress(long long percent);
+    void workerDone(int workerNumber, long long sumCount, double seconds, long beginning, long end, QVector<QString> workerResults); //Para recibir la señal con los datos necesarios
+    void updateProgress(int percent); //Para la barra de progreso
 };
 
 #endif // GOLDBACHCALCULATOR_H

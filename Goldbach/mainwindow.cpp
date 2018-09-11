@@ -22,12 +22,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 void MainWindow::on_lineEditNumber_textEdited(const QString &arg1)
 {
     (void)arg1;
-    //Q_UNUSED(arg1);
-
     bool enable = this->ui->lineEditNumber->text().trimmed().length() > 0;
     this->ui->pushButtonStart->setEnabled( enable );
 
@@ -58,7 +55,6 @@ void MainWindow::on_pushButtonStop_clicked(){
     this->goldbachCalculator->stop();
 }
 
-
 void MainWindow::on_pushButtonInfo_clicked(){
     if (!pushed){
         this->ui->plainTextEdit->show();
@@ -70,6 +66,7 @@ void MainWindow::on_pushButtonInfo_clicked(){
         this->ui->pushButtonInfo->setText("info");
         pushed = false;
     }
+
 }
 
 void MainWindow::prepare(){
@@ -95,6 +92,7 @@ void MainWindow::startCalculation(long long number)
     this->ui->pushButtonStop->setEnabled(true);
 
     if ( this->goldbachCalculator )
+
         this->goldbachCalculator->deleteLater();
 
     this->goldbachCalculator = new GoldbachCalculator(this);
@@ -105,17 +103,15 @@ void MainWindow::startCalculation(long long number)
 
     this->ui->listViewResults->setModel( this->goldbachCalculator );
 
-    time.start();
+    this->goldbachCalculator->calculate( number );
 
     this->ui->statusBar->showMessage(tr("Calculating..."));
 
-    this->goldbachCalculator->calculate( number );
+    time.start();
 
 }
 
-
-
-void MainWindow::updateProgressBar(long long percent)
+void MainWindow::updateProgressBar(int percent)
 {
     //Calculo del porcentaje
     progress += percent;
@@ -127,10 +123,9 @@ void MainWindow::updateProgressBar(long long percent)
 void MainWindow::calculationDone(int workerNumber, long long sumCount, double seconds, long beginning, long end, int ideal)
 {
     double totalTime = time.elapsed()/1000.0;
+    workerDone +=1;
 
-    workerDone +=1; //Aumenta la cantidad de workers terminados
-
-    if(beginning >= number){ //Si el worker no debia empezar
+    if(beginning >= number){
         this->ui->plainTextEdit->appendPlainText(tr(" WorkerNumber: %1 \n Uninitialized worker\n").arg(workerNumber));
     }
     else{
@@ -142,6 +137,7 @@ void MainWindow::calculationDone(int workerNumber, long long sumCount, double se
 
     this->ui->pushButtonInfo->setEnabled(true);
 
+
     if (workerDone >= ideal ){
         this->ui->pushButtonStart->setEnabled(true);
         this->ui->statusBar->showMessage(tr("%1 sums found in %2 seconds").arg(sumsFound).arg(totalTime));
@@ -149,10 +145,3 @@ void MainWindow::calculationDone(int workerNumber, long long sumCount, double se
     }
 
 }
-
-
-
-
-
-
-

@@ -10,20 +10,19 @@ class GoldbachWorker : public QThread
     Q_OBJECT
 
 protected:
-    long beginnig = 0;//Inicio del trabajo, será enviado por señal
-    long end = 0;//Final del trabajo, será enviado por señal
-    long long number = 0;//Numero a examinar
+    long long number = 0;    //Numero a examinar
+    int workerNumber = 0;  //Numero del worker
+    int workerCount = 0;  //Cantidad total de workers
+    long beginnig = 0; //Inicio del trabajo, será enviado por señal
+    long end = 0;     //Final del trabajo, será enviado por señal
     double seconds = 0; //Segundos que dura cada worker en realizar el trabajo, será enviado por señal
-    long long sumCount= 0;//Numero de sumas encontradas por cada worker, será enviado por señal
-    int workerCount = 0;//Cantidad total de workers
-    int workerNumber = 0;//Numero del worker
+    long long sumCount= 0;  //Numero de sumas encontradas por cada worker, será enviado por señal
     QTime timePerWorker; //Marca el tiempo por caa worker
-    QVector<QString> workerResults; //Almacenara las sumas de cada worker
-    bool * sieve;
-
+    bool *workerSieve = nullptr;
+    QVector<QString> workerResults;
 
 public:
-    explicit GoldbachWorker(long long number, int workerNumber, int workerCount, bool *  sieve, QObject *parent = nullptr);
+    explicit GoldbachWorker(long long number, int workerNumber, int workerCount, bool * sieveOfEratosthenes, QObject *parent = nullptr);
 
     /**
      * @brief calcula la cantidad de numeros que debe recorrer cada worker
@@ -53,9 +52,8 @@ protected:
     void run() override;
 
 signals:
-    //Señal para emitir los datos necesarios en el GoldBachCalculator
     void calculationDone(int workerNumber, long long sumCount,double seconds,long beginning,long end, QVector<QString> workerResults);
-    void updateProgress (long long percent); //Señal para actualizar la barra de progreso
+    void updateProgress (int percent); //Progreso de la barra
 
 public slots:
 

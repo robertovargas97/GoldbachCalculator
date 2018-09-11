@@ -2,9 +2,10 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
+#include <QtMath>
 #include "goldbachcalculator.h"
 #include "goldbachtester.h"
+
 
 GoldbachTester::GoldbachTester(int &argc, char **argv)
     : QCoreApplication(argc, argv)
@@ -18,8 +19,10 @@ int GoldbachTester::run()
         return 0;
     }
     else{
-        for ( int index = 1; index < this->arguments().count(); ++index )
+        for ( int index = 1; index < this->arguments().count(); ++index ){
             this->testDirectory( this->arguments()[index] );
+        }
+
     }
     return this->exec();
 }
@@ -54,20 +57,17 @@ bool GoldbachTester::testFile(const QFileInfo &fileInfo)
     this->calculators.insert(goldbachCalculator, fileInfo);
     this->connect( goldbachCalculator, &GoldbachCalculator::beginTest, this, &GoldbachTester::calculationDone );
     goldbachCalculator->calculate(number);
-
     return true;
 }
 
 void GoldbachTester::calculationDone()
 {
-    //Q_UNUSED(sumCount);
-
     GoldbachCalculator* goldbachCalculator = dynamic_cast<GoldbachCalculator*>( sender() );
     Q_ASSERT(goldbachCalculator);
 
     const QFileInfo& fileInfo = this->calculators.value( goldbachCalculator );
-    QVector<QString>& expectedSums = this->loadLines(fileInfo);
-    QVector<QString>& calculatorSums = goldbachCalculator->getAllSums();
+    const QVector<QString>& expectedSums = this->loadLines(fileInfo);
+    const QVector<QString>& calculatorSums = goldbachCalculator->getAllSums();
 
     bool success = true;
 
@@ -82,6 +82,10 @@ void GoldbachTester::calculationDone()
                 std::cout << "Expected: " << qPrintable( expectedSums[i] ) << "\n" << "Produced: " << qPrintable( calculatorSums[i] ) <<
                              "\n"  << std::endl;
                 success = false;
+
+                errorCases+=1;
+
+                totalCases+=1;
             }
         }
         else{ //Se acabo el vector de resultados Goldbach
@@ -91,17 +95,29 @@ void GoldbachTester::calculationDone()
             std::cout << "Expected: " << qPrintable( expectedSums[i] ) << "\n" << "Produced: " << "Nothing produced in this line" <<
                          "\n"  << std::endl;
             success = false;
+
+            errorCases+=1;
+
+            totalCases+=1;
         }
     }
 
     if (success){ //Si nada falla
-        std::cout << "Test case passed: " << qPrintable(fileInfo.fileName()) << std::endl;
-    }
+        succesCases+=1;
 
+        totalCases+=1;
+        // std::cout << "Test case passed: " << qPrintable(fileInfo.fileName()) << std::endl;
+    }
     goldbachCalculator->deleteLater();
     this->calculators.remove( goldbachCalculator );
     if ( this->calculators.count() <= 0 )
         this->quit();
+}
+
+void GoldbachTester::testPercent(){
+    std::cout << "\nPassed cases: " << succesCases << " (" << qFloor( (succesCases/totalCases)*100)<<"% )" << std::endl;
+    std::cout << "Failed cases: " << errorCases << " (" << qCeil( (errorCases/totalCases)*100)<<"% )" << std::endl;
+    std::cout << "Total cases: " << totalCases << "\n" << std::endl;
 }
 
 QVector<QString> GoldbachTester::loadLines(const QFileInfo &fileInfo)
